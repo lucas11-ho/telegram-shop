@@ -35,7 +35,7 @@ export default function AdminPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin.lenagames.online";
       const form = new FormData();
       form.append("username", username);
       form.append("password", password);
