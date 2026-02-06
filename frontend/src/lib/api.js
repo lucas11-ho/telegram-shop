@@ -31,3 +31,5 @@ export async function api(path, { method = "GET", headers, body } = {}) {
 export function apiUrl() {
   return API_URL;
 }
+
+console.log(import.meta.env.VITE_API_BASE_URL);  // Log the value
