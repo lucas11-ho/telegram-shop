@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Telegram Login Widget only works in regular browsers (not inside Telegram WebApp).
- * It will call window.onTelegramAuth(user) with widget payload.
- */
-export default function TelegramLoginWidget({ botUsername }) {
+// Telegram Login Widget only works in regular browsers (not inside Telegram WebApp).
+// It will call window.onTelegramAuth(user) with widget payload.
+
+export default function TelegramLoginWidget() {
+  const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME;
   const ref = useRef(null);
 
   useEffect(() => {
