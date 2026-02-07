@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, getToken } from "../lib/api";
-import { ui } from "../ui/tokens.jsx";
+import { ui } from "../ui/tokens";
 import { Card, CardBody } from "../ui/components/Card.jsx";
 import { Button } from "../ui/components/Button.jsx";
 
