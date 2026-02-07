@@ -1,13 +1,18 @@
-import { ui } from "../tokens";
-
-export function Card({ className = "", children }) {
-  return <div className={`${ui.card} ${className}`}>{children}</div>;
+export function Card({ className = "", ...props }) {
+  return (
+    <div
+      className={
+        "rounded-2xl border border-black/5 bg-white shadow-sm " + className
+      }
+      {...props}
+    />
+  );
 }
 
-export function CardHeader({ className = "", children }) {
-  return <div className={`${ui.cardHeader} ${className}`}>{children}</div>;
+export function CardHeader({ className = "", ...props }) {
+  return <div className={"px-5 pt-5 " + className} {...props} />;
 }
 
-export function CardBody({ className = "", children }) {
-  return <div className={`${ui.cardBody} ${className}`}>{children}</div>;
+export function CardBody({ className = "", ...props }) {
+  return <div className={"px-5 pb-5 " + className} {...props} />;
 }
