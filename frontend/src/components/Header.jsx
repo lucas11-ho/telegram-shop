@@ -1,30 +1,30 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { setToken, getToken } from "../lib/api";
-import { clearToken } from "../lib/api";
-
-function logout() {
-  clearToken();
-  window.location.hash = "#/";
-  window.location.reload();
-}
+import { clearToken, getToken, onTokenChange } from "../lib/api";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const nav = useNavigate();
-  const authed = !!getToken();
+  const [authed, setAuthed] = useState(!!getToken());
+
+  useEffect(() => {
+    return onTokenChange(() => setAuthed(!!getToken()));
+  }, []);
 
   return (
     <header className="border-b bg-white">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
         <Link to="/" className="font-semibold text-lg">Telegram Shop</Link>
+
         <nav className="flex items-center gap-3 text-sm">
           <NavLink to="/" className={({isActive})=>isActive?"font-semibold":""}>Shop</NavLink>
           <NavLink to="/upload" className={({isActive})=>isActive?"font-semibold":""}>Upload</NavLink>
           <NavLink to="/cart" className={({isActive})=>isActive?"font-semibold":""}>Cart</NavLink>
           <NavLink to="/admin" className={({isActive})=>isActive?"font-semibold":""}>Admin</NavLink>
+
           {authed && (
             <button
               className="ml-2 rounded px-2 py-1 border hover:bg-gray-50"
-              onClick={() => { setToken(""); nav("/"); }}
+              onClick={() => { clearToken(); nav("/"); }}
               title="Logout"
             >
               Logout
