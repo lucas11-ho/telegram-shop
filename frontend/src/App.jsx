@@ -5,7 +5,7 @@
  import CartPage from "./pages/CartPage.jsx";
  import AdminPage from "./pages/AdminPage.jsx";
  import AuthBootstrap from "./pages/AuthBootstrap.jsx";
-+import { ui } from "./ui/tokens";
+ import { ui } from "./ui/tokens";
 
  export default function App() {
    return (
