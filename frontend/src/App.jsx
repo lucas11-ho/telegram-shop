@@ -1,28 +1,25 @@
- import { Routes, Route, Navigate } from "react-router-dom";
- import Header from "./components/Header.jsx";
- import HomePage from "./pages/HomePage.jsx";
- import UploadPage from "./pages/UploadPage.jsx";
- import CartPage from "./pages/CartPage.jsx";
- import AdminPage from "./pages/AdminPage.jsx";
- import AuthBootstrap from "./pages/AuthBootstrap.jsx";
- import { ui } from "./ui/tokens";
+import { Routes, Route } from "react-router-dom";
+import Header from "./components/Header.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import UploadPage from "./pages/UploadPage.jsx";
+import CartPage from "./pages/CartPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import AuthBootstrap from "./pages/AuthBootstrap.jsx";
+import { ui } from "./ui/tokens";
 
- export default function App() {
-   return (
--    <div className="min-h-[100dvh] bg-gray-50">
-+    <div className={ui.page}>
-       <AuthBootstrap />
-       <Header />
--      <main className="mx-auto max-w-5xl px-4 py-6">
-+      <main className={`${ui.container} py-6`}>
-         <Routes>
-           <Route path="/" element={<HomePage />} />
-           <Route path="/upload" element={<UploadPage />} />
-           <Route path="/cart" element={<CartPage />} />
-           <Route path="/admin" element={<AdminPage />} />
-           <Route path="*" element={<Navigate to="/" replace />} />
-         </Routes>
-       </main>
-     </div>
-   );
- }
+export default function App() {
+  return (
+    <div className={ui.page}>
+      <AuthBootstrap />
+      <Header />
+      <main className={ui.container}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
