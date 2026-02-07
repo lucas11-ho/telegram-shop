@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { clearToken, getToken, onTokenChange } from "../lib/api";
+import { clearToken, getToken } from "../lib/api";
 import { useEffect, useState } from "react";
 import { ui } from "../ui/tokens";
 
@@ -8,24 +8,18 @@ export default function Header() {
   const [authed, setAuthed] = useState(!!getToken());
 
   useEffect(() => {
-    const off = onTokenChange?.(() => setAuthed(!!getToken()));
-    return () => off?.();
+    const t = setInterval(() => setAuthed(!!getToken()), 500);
+    return () => clearInterval(t);
   }, []);
 
-  function logout() {
-    clearToken();
-    setAuthed(false);
-    nav("/");
-  }
-
   return (
-    <header className="border-b border-black/10 bg-white">
+    <header className="border-b border-black/5 bg-white">
       <div className={`${ui.container} flex items-center justify-between py-4`}>
-        <Link to="/" className="font-semibold tracking-tight">
+        <Link to="/" className="text-lg font-semibold tracking-tight">
           Telegram Shop
         </Link>
 
-        <nav className="flex items-center gap-3 text-sm">
+        <nav className="flex items-center gap-4 text-sm">
           <NavLink to="/" className={({ isActive }) => (isActive ? "font-semibold" : "text-neutral-600 hover:text-neutral-900")}>
             Shop
           </NavLink>
@@ -41,9 +35,13 @@ export default function Header() {
 
           {authed && (
             <button
-              className={`${ui.buttonBase} ${ui.buttonSecondary} ml-2`}
-              onClick={logout}
-              type="button"
+              className="ml-2 rounded-lg border border-black/10 px-3 py-1.5 text-sm hover:bg-neutral-50"
+              onClick={() => {
+                clearToken();
+                nav("/");
+                setAuthed(false);
+              }}
+              title="Logout"
             >
               Logout
             </button>
