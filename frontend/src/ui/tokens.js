@@ -1,37 +1,24 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { clearToken, getToken, onTokenChange } from "../lib/api";
-import { useEffect, useState } from "react";
+export const ui = {
+  page: "min-h-[100dvh] bg-[#FAFAFA] text-neutral-900",
+  container: "mx-auto max-w-5xl px-4",
 
-export default function Header() {
-  const nav = useNavigate();
-  const [authed, setAuthed] = useState(!!getToken());
+  h1: "text-2xl md:text-3xl font-semibold tracking-tight",
+  h2: "text-lg md:text-xl font-semibold tracking-tight",
+  muted: "text-neutral-500",
 
-  useEffect(() => {
-    return onTokenChange(() => setAuthed(!!getToken()));
-  }, []);
+  card: "rounded-2xl border border-black/5 bg-white shadow-sm",
+  cardHeader: "px-5 pt-5",
+  cardBody: "px-5 pb-5",
 
-  return (
-    <header className="border-b bg-white">
-      <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-semibold text-lg">Telegram Shop</Link>
+  input:
+    "w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm " +
+    "placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/10",
 
-        <nav className="flex items-center gap-3 text-sm">
-          <NavLink to="/" className={({isActive})=>isActive?"font-semibold":""}>Shop</NavLink>
-          <NavLink to="/upload" className={({isActive})=>isActive?"font-semibold":""}>Upload</NavLink>
-          <NavLink to="/cart" className={({isActive})=>isActive?"font-semibold":""}>Cart</NavLink>
-          <NavLink to="/admin" className={({isActive})=>isActive?"font-semibold":""}>Admin</NavLink>
+  buttonBase:
+    "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium " +
+    "transition focus:outline-none focus:ring-2 focus:ring-black/10 disabled:opacity-50 disabled:cursor-not-allowed",
 
-          {authed && (
-            <button
-              className="ml-2 rounded px-2 py-1 border hover:bg-gray-50"
-              onClick={() => { clearToken(); nav("/"); }}
-              title="Logout"
-            >
-              Logout
-            </button>
-          )}
-        </nav>
-      </div>
-    </header>
-  );
-}
+  buttonPrimary: "bg-black text-white hover:bg-black/90",
+  buttonSecondary: "border border-black/10 bg-white hover:bg-black/5",
+  buttonDanger: "border border-red-500/20 bg-red-50 text-red-700 hover:bg-red-100",
+};
