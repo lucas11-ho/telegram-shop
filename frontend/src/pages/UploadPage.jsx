@@ -1,135 +1,89 @@
 import { useState } from "react";
 import { api, getToken } from "../lib/api";
-import { ui } from "../ui/tokens.jsx";
-import { Card, CardBody } from "../ui/components/Card.jsx";
-import { Button } from "../ui/components/Button.jsx";
-import { Input, Label } from "../ui/components/Input.jsx";
+import { ui } from "../ui/tokens";
 
 export default function UploadPage() {
-  const authed = !!getToken();
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState("USD");
-  const [description, setDescription] = useState("");
-  const [paymentInstructions, setPaymentInstructions] = useState("");
-  const [images, setImages] = useState([]);
-  const [busy, setBusy] = useState(false);
+  const [file, setFile] = useState(null);
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = async (e) => {
+  async function submit(e) {
     e.preventDefault();
-    setBusy(true);
+    setErr("");
+    setMsg("");
+
+    if (!getToken()) {
+      setErr("You must be logged in to upload.");
+      return;
+    }
+    if (!title.trim()) return setErr("Title is required.");
+    if (!price || isNaN(Number(price))) return setErr("Valid price is required.");
+    if (!file) return setErr("Image is required.");
+
+    setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("name", name);
-      fd.append("price", price);
-      fd.append("currency", currency);
-      if (description) fd.append("description", description);
-      if (paymentInstructions) fd.append("payment_instructions", paymentInstructions);
-      for (const f of images) fd.append("images", f);
+      fd.append("title", title.trim());
+      fd.append("price", String(price));
+      fd.append("image", file);
 
-      const created = await api("/products", { method: "POST", body: fd });
-      alert(`Uploaded: ${created.name}`);
-
-      setName("");
+      await api("/products", { method: "POST", body: fd });
+      setMsg("Uploaded successfully.");
+      setTitle("");
       setPrice("");
-      setCurrency("USD");
-      setDescription("");
-      setPaymentInstructions("");
-      setImages([]);
-    } catch (e) {
-      alert(String(e.message || e));
+      setFile(null);
+    } catch (e2) {
+      setErr(e2?.message || "Upload failed");
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
-  };
-
-  if (!authed) {
-    return (
-      <Card className="max-w-2xl">
-        <CardBody>
-          <div className="font-medium">Login required</div>
-          <div className={`text-sm ${ui.muted} mt-1`}>
-            Open the app inside Telegram or use the Telegram Login widget to login.
-          </div>
-        </CardBody>
-      </Card>
-    );
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className={`${ui.h1} mb-4`}>Upload product</h1>
+    <div className={ui.page}>
+      <div className={ui.container}>
+        <h1 className={`${ui.h1} pt-6`}>Upload</h1>
 
-      <Card>
-        <CardBody>
-          <form onSubmit={submit} className="space-y-4">
-            <div>
-              <Label>Name</Label>
-              <div className="mt-1">
-                <Input value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
+        <form onSubmit={submit} className="mt-6 max-w-xl space-y-4">
+          <div>
+            <div className="mb-1 text-sm text-neutral-700">Title</div>
+            <input className={ui.input} value={title} onChange={(e) => setTitle(e.target.value)} />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm text-neutral-700">Price</div>
+            <input className={ui.input} value={price} onChange={(e) => setPrice(e.target.value)} />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm text-neutral-700">Photo</div>
+            <input
+              className={ui.input}
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+          </div>
+
+          {err && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {err}
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label>Price</Label>
-                <div className="mt-1">
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label>Currency</Label>
-                <div className="mt-1">
-                  <Input value={currency} onChange={(e) => setCurrency(e.target.value)} />
-                </div>
-              </div>
+          )}
+          {msg && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {msg}
             </div>
+          )}
 
-            <div>
-              <Label>Description</Label>
-              <textarea
-                className={`${ui.input} mt-1 min-h-[96px]`}
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label>Payment instructions (QR/notes)</Label>
-              <textarea
-                className={`${ui.input} mt-1 min-h-[96px]`}
-                rows={3}
-                value={paymentInstructions}
-                onChange={(e) => setPaymentInstructions(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label>Images</Label>
-              <input
-                className="mt-2 w-full text-sm"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => setImages(Array.from(e.target.files || []))}
-              />
-              <div className={`text-xs ${ui.muted} mt-1`}>PNG/JPG/WebP recommended.</div>
-            </div>
-
-            <Button disabled={busy} className="w-full sm:w-auto">
-              {busy ? "Uploading..." : "Upload"}
-            </Button>
-          </form>
-        </CardBody>
-      </Card>
+          <button className={`${ui.buttonBase} ${ui.buttonPrimary}`} disabled={loading} type="submit">
+            {loading ? "Uploading..." : "Upload"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
