@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { api, getToken } from "../lib/api";
-import { ui } from "../ui/tokens";
-import { Card, CardBody } from "../ui/components/Card";
-import { Button } from "../ui/components/Button";
+import { ui } from "../ui/tokens.jsx";
+import { Card, CardBody } from "../ui/components/Card.jsx";
+import { Button } from "../ui/components/Button.jsx";
 
 function loadCart() {
   return JSON.parse(localStorage.getItem("cart") || "[]");
