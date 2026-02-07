@@ -16,7 +16,7 @@ export default function Header() {
     <header className="border-b border-black/5 bg-white">
       <div className={`${ui.container} flex items-center justify-between py-4`}>
         <Link to="/" className="text-lg font-semibold tracking-tight">
-          Telegram Shop
+          Lucas Shoppyfly 💕
         </Link>
 
         <nav className="flex items-center gap-4 text-sm">
