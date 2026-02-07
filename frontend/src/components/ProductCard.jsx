@@ -1,7 +1,7 @@
  import { apiUrl } from "../lib/api";
-+import { Card, CardBody } from "../ui/components/Card";
-+import { Button } from "../ui/components/Button";
-+import { ui } from "../ui/tokens";
+ import { Card, CardBody } from "../ui/components/Card";
+ import { Button } from "../ui/components/Button";
+ import { ui } from "../ui/tokens";
 
  export default function ProductCard({ product, onAdd }) {
    const img = product.images?.[0]?.url ? `${apiUrl()}${product.images[0].url}` : null;
