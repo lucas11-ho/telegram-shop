@@ -1,80 +1,59 @@
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard.jsx";
 import { api } from "../lib/api";
-import { ui } from "../ui/tokens.jsx";
-import { Input } from "../ui/components/Input.jsx";
-import { Card, CardBody } from "../ui/components/Card.jsx";
-
-function loadCart() {
-  return JSON.parse(localStorage.getItem("cart") || "[]");
-}
-
-function saveCart(items) {
-  localStorage.setItem("cart", JSON.stringify(items));
-}
+import { ui } from "../ui/tokens";
 
 export default function HomePage() {
-  const [products, setProducts] = useState([]);
+  const [items, setItems] = useState([]);
   const [q, setQ] = useState("");
-  const [error, setError] = useState("");
+  const [err, setErr] = useState("");
 
   useEffect(() => {
+    let alive = true;
     api("/products")
-      .then(setProducts)
-      .catch((e) => setError(String(e.message || e)));
+      .then((data) => {
+        if (!alive) return;
+        setItems(Array.isArray(data) ? data : []);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setErr(e?.message || "Failed to fetch");
+      });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {
-    const qq = q.trim().toLowerCase();
-    if (!qq) return products;
-    return products.filter((p) => String(p.name || "").toLowerCase().includes(qq));
-  }, [products, q]);
-
-  const onAdd = (p) => {
-    const cart = loadCart();
-    const idx = cart.findIndex((x) => x.product_id === p.id);
-    if (idx >= 0) cart[idx].quantity += 1;
-    else {
-      cart.push({
-        product_id: p.id,
-        name: p.name,
-        price: p.price,
-        currency: p.currency,
-        quantity: 1,
-      });
-    }
-    saveCart(cart);
-    alert("Added to cart");
-  };
+    const s = q.trim().toLowerCase();
+    if (!s) return items;
+    return items.filter((p) => (p?.title || "").toLowerCase().includes(s));
+  }, [items, q]);
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
-        <div>
+    <div className={ui.page}>
+      <div className={ui.container}>
+        <div className="flex items-center justify-between gap-4 pt-6">
           <h1 className={ui.h1}>Shop</h1>
-          <div className={`text-sm ${ui.muted} mt-1`}>
-            Browse products and add to cart.
-          </div>
-        </div>
-        <div className="w-full sm:max-w-sm">
-          <Input
+          <input
+            className={ui.input}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search products..."
           />
         </div>
-      </div>
 
-      {error && (
-        <Card className="border-red-500/20 bg-red-50">
-          <CardBody className="text-sm text-red-700">{error}</CardBody>
-        </Card>
-      )}
+        {err && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {err}
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-        {filtered.map((p) => (
-          <ProductCard key={p.id} product={p} onAdd={onAdd} />
-        ))}
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
       </div>
     </div>
   );
