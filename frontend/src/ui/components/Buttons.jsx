@@ -1,13 +1,12 @@
 import { ui } from "../tokens";
 
-export function Card({ className = "", children }) {
-  return <div className={`${ui.card} ${className}`}>{children}</div>;
-}
+export function Button({ variant = "primary", className = "", ...props }) {
+  const v =
+    variant === "secondary"
+      ? ui.buttonSecondary
+      : variant === "danger"
+      ? ui.buttonDanger
+      : ui.buttonPrimary;
 
-export function CardHeader({ className = "", children }) {
-  return <div className={`${ui.cardHeader} ${className}`}>{children}</div>;
-}
-
-export function CardBody({ className = "", children }) {
-  return <div className={`${ui.cardBody} ${className}`}>{children}</div>;
+  return <button className={`${ui.buttonBase} ${v} ${className}`} {...props} />;
 }
