@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard.jsx";
 import { api } from "../lib/api";
-import { ui } from "../ui/tokens";
-import { Input } from "../ui/components/Input";
-import { Card, CardBody } from "../ui/components/Card";
+import { ui } from "../ui/tokens.jsx";
+import { Input } from "../ui/components/Input.jsx";
+import { Card, CardBody } from "../ui/components/Card.jsx";
 
 function loadCart() {
   return JSON.parse(localStorage.getItem("cart") || "[]");
