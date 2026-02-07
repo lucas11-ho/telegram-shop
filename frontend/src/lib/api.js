@@ -1,4 +1,28 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const TOKEN_EVENT = "auth:token";
+
+export function setToken(token) {
+  try {
+    if (token) localStorage.setItem("token", token);
+    window.dispatchEvent(new Event(TOKEN_EVENT));
+  } catch {}
+}
+
+export function clearToken() {
+  try {
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event(TOKEN_EVENT));
+  } catch {}
+}
+
+export function onTokenChange(cb) {
+  window.addEventListener(TOKEN_EVENT, cb);
+  window.addEventListener("storage", cb); // multi-tab
+  return () => {
+    window.removeEventListener(TOKEN_EVENT, cb);
+    window.removeEventListener("storage", cb);
+  };
+}
 
 function join(base, path) {
   return `${base.replace(/\/+$/, "")}/${String(path).replace(/^\/+/, "")}`;
