@@ -19,5 +19,6 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.12",
     "vite": "^5.4.8"
+    "postinstall": "chmod -R +x node_modules/.bin || true"
   }
 }
