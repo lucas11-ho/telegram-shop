@@ -1,81 +1,52 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { clearToken, getToken, onTokenChange } from "../lib/api";
 import { useEffect, useState } from "react";
-import { ui } from "../ui/tokens.jsx";
-import { Button } from "../ui/components/Button.jsx";
+import { ui } from "../ui/tokens";
 
 export default function Header() {
   const nav = useNavigate();
   const [authed, setAuthed] = useState(!!getToken());
 
   useEffect(() => {
-    return onTokenChange(() => setAuthed(!!getToken()));
+    const off = onTokenChange?.(() => setAuthed(!!getToken()));
+    return () => off?.();
   }, []);
 
+  function logout() {
+    clearToken();
+    setAuthed(false);
+    nav("/");
+  }
+
   return (
-    <header className="sticky top-0 z-20 border-b border-black/5 bg-white/80 backdrop-blur">
-      <div className={`${ui.container} py-4 flex items-center justify-between`}>
-        <Link to="/" className="font-semibold text-lg tracking-tight">
+    <header className="border-b border-black/10 bg-white">
+      <div className={`${ui.container} flex items-center justify-between py-4`}>
+        <Link to="/" className="font-semibold tracking-tight">
           Telegram Shop
         </Link>
 
-        <nav className="flex items-center gap-4 text-sm text-neutral-700">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive
-                ? "font-semibold text-neutral-900"
-                : "hover:text-neutral-900"
-            }
-          >
+        <nav className="flex items-center gap-3 text-sm">
+          <NavLink to="/" className={({ isActive }) => (isActive ? "font-semibold" : "text-neutral-600 hover:text-neutral-900")}>
             Shop
           </NavLink>
-
-          <NavLink
-            to="/upload"
-            className={({ isActive }) =>
-              isActive
-                ? "font-semibold text-neutral-900"
-                : "hover:text-neutral-900"
-            }
-          >
+          <NavLink to="/upload" className={({ isActive }) => (isActive ? "font-semibold" : "text-neutral-600 hover:text-neutral-900")}>
             Upload
           </NavLink>
-
-          <NavLink
-            to="/cart"
-            className={({ isActive }) =>
-              isActive
-                ? "font-semibold text-neutral-900"
-                : "hover:text-neutral-900"
-            }
-          >
+          <NavLink to="/cart" className={({ isActive }) => (isActive ? "font-semibold" : "text-neutral-600 hover:text-neutral-900")}>
             Cart
           </NavLink>
-
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              isActive
-                ? "font-semibold text-neutral-900"
-                : "hover:text-neutral-900"
-            }
-          >
+          <NavLink to="/admin" className={({ isActive }) => (isActive ? "font-semibold" : "text-neutral-600 hover:text-neutral-900")}>
             Admin
           </NavLink>
 
           {authed && (
-            <Button
-              variant="secondary"
-              className="ml-2"
-              onClick={() => {
-                clearToken();
-                nav("/");
-              }}
-              title="Logout"
+            <button
+              className={`${ui.buttonBase} ${ui.buttonSecondary} ml-2`}
+              onClick={logout}
+              type="button"
             >
               Logout
-            </Button>
+            </button>
           )}
         </nav>
       </div>
