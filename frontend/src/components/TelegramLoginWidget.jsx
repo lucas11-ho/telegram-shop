@@ -3,7 +3,8 @@ import { useEffect, useRef } from "react";
 // Telegram Login Widget only works in regular browsers (not inside Telegram WebApp).
 // It will call window.onTelegramAuth(user) with widget payload.
 
-export default function TelegramLoginWidget({ botUsername }) {
+export default function TelegramLoginWidget() {
+  const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME;
   const ref = useRef(null);
 
   useEffect(() => {
@@ -15,8 +16,7 @@ export default function TelegramLoginWidget({ botUsername }) {
     const s = document.createElement("script");
     s.async = true;
     s.src = "https://telegram.org/js/telegram-widget.js?22";
-    // Telegram expects the bot username WITHOUT leading '@'.
-    s.setAttribute("data-telegram-login", String(botUsername).replace(/^@/, ""));
+    s.setAttribute("data-telegram-login", botUsername);
     s.setAttribute("data-size", "large");
     s.setAttribute("data-userpic", "true");
     s.setAttribute("data-request-access", "write");

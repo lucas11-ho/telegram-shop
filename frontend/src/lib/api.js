@@ -70,3 +70,5 @@ export async function api(path, { method = "GET", headers, body, signal } = {}) 
 
   return payload;
 }
+
+console.log(import.meta.env.VITE_API_BASE_URL);  // Log the value
