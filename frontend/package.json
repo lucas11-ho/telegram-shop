@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "node ./node_modules/vite/bin/vite.js build",
     "preview": "vite preview",
-    "postinstall": "chmod -R +x node_modules/.bin || true"
+    "postinstall": "node ./scripts/fix-perms.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
