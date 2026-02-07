@@ -8,7 +8,7 @@ import AuthBootstrap from "./pages/AuthBootstrap.jsx";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[100dvh] bg-gray-50">
       <AuthBootstrap />
       <Header />
       <main className="mx-auto max-w-5xl px-4 py-6">

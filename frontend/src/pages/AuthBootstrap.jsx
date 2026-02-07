@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import TelegramLoginWidget from "../components/TelegramLoginWidget.jsx";
 import { api, getToken, setToken } from "../lib/api";
-import { getInitData } from "../lib/telegram";
+import { getInitData, initTelegramUI } from "../lib/telegram";
 
 /**
  * If running inside Telegram WebApp: auto-login by verifying initData.
@@ -11,11 +11,14 @@ import { getInitData } from "../lib/telegram";
 export default function AuthBootstrap() {
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState("unknown"); // webapp | widget | none
-  const token = getToken();
+  const [token, setTokenState] = useState(() => getToken());
 
   useEffect(() => {
     async function run() {
       try {
+        // No-op in regular browsers. Helps layout + lifecycle inside Telegram.
+        initTelegramUI();
+
         if (token) {
           setMode("done");
           setReady(true);
@@ -26,6 +29,7 @@ export default function AuthBootstrap() {
           setMode("webapp");
           const data = await api("/auth/webapp", { method: "POST", body: { init_data: initData } });
           setToken(data.access_token);
+          setTokenState(data.access_token);
           setMode("done");
         } else {
           setMode("widget");
@@ -47,7 +51,8 @@ export default function AuthBootstrap() {
       try {
         const data = await api("/auth/telegram-widget", { method: "POST", body: user });
         setToken(data.access_token);
-        location.reload();
+        setTokenState(data.access_token);
+        setMode("done");
       } catch (e) {
         alert("Telegram login failed. Check backend TELEGRAM_BOT_TOKEN and bot username.");
         console.error(e);
@@ -59,7 +64,7 @@ export default function AuthBootstrap() {
   if (!ready) return null;
   if (mode !== "widget" || token) return null;
 
-  const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "";
+  const botUsername = (import.meta.env.VITE_TELEGRAM_BOT_USERNAME || "").trim();
   if (!botUsername) return null;
 
   return (

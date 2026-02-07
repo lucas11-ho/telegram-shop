@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, getToken, setToken } from "../lib/api";
+import { api, apiUrl, getToken, setToken } from "../lib/api";
 
 export default function AdminPage() {
   const [mode, setMode] = useState("login"); // login | dashboard
@@ -35,13 +35,18 @@ export default function AdminPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin.lenagames.online";
       const form = new FormData();
       form.append("username", username);
       form.append("password", password);
-      const res = await fetch(`${API_URL}/auth/admin/login`, { method: "POST", body: form });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
+      // Use the same base URL as the shared api() helper.
+      const res = await fetch(`${apiUrl().replace(/\/+$/, "")}/auth/admin/login`, {
+        method: "POST",
+        body: form,
+        headers: { "X-Request-ID": `admin_${Date.now()}` },
+      });
+      if (!res.ok) throw new Error((await res.text()) || `HTTP ${res.status}`);
+      const data = await res.json().catch(() => null);
+      if (!data?.access_token) throw new Error("Invalid login response (missing access_token)");
       setToken(data.access_token);
       await loadAll();
       setMode("dashboard");
