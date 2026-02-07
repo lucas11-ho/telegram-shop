@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { api, getToken } from "../lib/api";
-import { ui } from "../ui/tokens";
-import { Card, CardBody } from "../ui/components/Card";
-import { Button } from "../ui/components/Button";
-import { Input, Label } from "../ui/components/Input";
+import { ui } from "../ui/tokens.jsx";
+import { Card, CardBody } from "../ui/components/Card.jsx";
+import { Button } from "../ui/components/Button.jsx";
+import { Input, Label } from "../ui/components/Input.jsx";
 
 export default function UploadPage() {
   const authed = !!getToken();
