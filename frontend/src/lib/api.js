@@ -9,11 +9,31 @@ export function apiUrl() {
   return API_BASE_URL;
 }
 
-function getToken() {
+export function setToken(token) {
+  try {
+    if (token) localStorage.setItem("token", token);
+  } catch {}
+}
+
+export function getToken() {
   try {
     return localStorage.getItem("token");
   } catch {
     return null;
+  }
+}
+
+export function clearToken() {
+  try {
+    localStorage.removeItem("token");
+  } catch {}
+}
+
+function requestId() {
+  try {
+    return crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+  } catch {
+    return `${Date.now()}-${Math.random()}`;
   }
 }
 
@@ -24,6 +44,7 @@ export async function api(path, { method = "GET", headers, body } = {}) {
   const res = await fetch(join(base, path), {
     method,
     headers: {
+      "X-Request-ID": requestId(),
       ...(body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(headers || {})
@@ -32,7 +53,9 @@ export async function api(path, { method = "GET", headers, body } = {}) {
   });
 
   const ct = res.headers.get("content-type") || "";
-  const payload = ct.includes("application/json") ? await res.json().catch(() => null) : await res.text();
+  const payload = ct.includes("application/json")
+    ? await res.json().catch(() => null)
+    : await res.text().catch(() => "");
 
   if (!res.ok) {
     const msg =
