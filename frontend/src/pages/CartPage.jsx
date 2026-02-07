@@ -1,148 +1,87 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, getToken } from "../lib/api";
 import { ui } from "../ui/tokens";
-import { Card, CardBody } from "../ui/components/Card.jsx";
-import { Button } from "../ui/components/Button.jsx";
-
-function loadCart() {
-  return JSON.parse(localStorage.getItem("cart") || "[]");
-}
-
-function saveCart(items) {
-  localStorage.setItem("cart", JSON.stringify(items));
-}
 
 export default function CartPage() {
-  const authed = !!getToken();
-  const [items, setItems] = useState(loadCart());
-  const [busy, setBusy] = useState(false);
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
 
-  useEffect(() => saveCart(items), [items]);
-
-  const total = items.reduce((acc, it) => acc + it.price * it.quantity, 0);
-
-  const inc = (i) =>
-    setItems((prev) =>
-      prev.map((x, idx) => (idx === i ? { ...x, quantity: x.quantity + 1 } : x))
-    );
-
-  const dec = (i) =>
-    setItems((prev) =>
-      prev.map((x, idx) =>
-        idx === i ? { ...x, quantity: Math.max(1, x.quantity - 1) } : x
-      )
-    );
-
-  const remove = (i) => setItems((prev) => prev.filter((_, idx) => idx !== i));
-  const clear = () => setItems([]);
-
-  const checkout = async () => {
-    if (!authed) return alert("Login required");
-    if (!items.length) return;
-
-    setBusy(true);
+  useEffect(() => {
+    // If your app stores cart in localStorage, keep this logic minimal:
     try {
-      const currency = items[0].currency || "USD";
-      const body = {
-        currency,
-        items: items.map((x) => ({ product_id: x.product_id, quantity: x.quantity })),
-      };
-      const order = await api("/orders", { method: "POST", body });
-      alert(
-        `Order created (#${order.id}). Payment status: ${order.payment_status}.\n\nSeller payment instructions are on each product page in a full app.`
-      );
-      clear();
-    } catch (e) {
-      alert(String(e.message || e));
-    } finally {
-      setBusy(false);
+      const raw = localStorage.getItem("cart");
+      setItems(raw ? JSON.parse(raw) : []);
+    } catch {
+      setItems([]);
     }
-  };
+  }, []);
+
+  const total = useMemo(() => {
+    return items.reduce((sum, it) => sum + Number(it?.price || 0), 0);
+  }, [items]);
+
+  async function checkout() {
+    setErr("");
+    const token = getToken();
+    if (!token) {
+      setErr("Please login first.");
+      return;
+    }
+
+    try {
+      // Keep your existing endpoint/contract:
+      await api("/orders", {
+        method: "POST",
+        body: { items },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      localStorage.removeItem("cart");
+      setItems([]);
+    } catch (e) {
+      setErr(e?.message || "Failed to checkout");
+    }
+  }
 
   return (
-    <div className="max-w-2xl">
-      <div className="flex items-end justify-between mb-4 gap-3">
-        <div>
+    <div className={ui.page}>
+      <div className={ui.container}>
+        <div className="flex items-center justify-between py-6">
           <h1 className={ui.h1}>Cart</h1>
-          <div className={`text-sm ${ui.muted} mt-1`}>
-            Review your items before checkout.
+          <div className="text-sm text-neutral-600">Total: {total}</div>
+        </div>
+
+        {err && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {err}
           </div>
-        </div>
-
-        {items.length > 0 && (
-          <Button variant="secondary" onClick={clear}>
-            Clear
-          </Button>
         )}
-      </div>
 
-      {!items.length && (
-        <Card>
-          <CardBody className={`text-sm ${ui.muted}`}>Your cart is empty.</CardBody>
-        </Card>
-      )}
+        <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+          {items.length === 0 ? (
+            <div className={ui.muted}>Your cart is empty.</div>
+          ) : (
+            <>
+              <ul className="divide-y divide-black/5">
+                {items.map((it, idx) => (
+                  <li key={idx} className="flex items-center justify-between py-3">
+                    <div>
+                      <div className="font-medium">{it?.title}</div>
+                      <div className="text-sm text-neutral-500">{it?.price}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
 
-      <div className="space-y-3">
-        {items.map((it, i) => (
-          <Card key={`${it.product_id}-${i}`}>
-            <CardBody className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <div className="font-medium truncate">{it.name}</div>
-                <div className={`text-sm ${ui.muted}`}>
-                  {it.price} {it.currency}
-                </div>
+              <div className="mt-6 flex justify-end">
+                <button className={ui.buttonPrimary} onClick={checkout}>
+                  Checkout
+                </button>
               </div>
-
-              <div className="flex items-center gap-2 flex-wrap justify-end">
-                <Button
-                  variant="secondary"
-                  className="px-3 py-1"
-                  onClick={() => dec(i)}
-                >
-                  -
-                </Button>
-                <div className="w-8 text-center text-sm">{it.quantity}</div>
-                <Button
-                  variant="secondary"
-                  className="px-3 py-1"
-                  onClick={() => inc(i)}
-                >
-                  +
-                </Button>
-                <Button
-                  variant="danger"
-                  className="px-3 py-1"
-                  onClick={() => remove(i)}
-                >
-                  Remove
-                </Button>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
-
-      {items.length > 0 && (
-        <Card className="mt-4">
-          <CardBody className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="text-sm">
-              <span className={ui.muted}>Total</span>{" "}
-              <span className="font-semibold">
-                {total.toFixed(2)} {items[0].currency}
-              </span>
-            </div>
-            <Button disabled={busy} onClick={checkout}>
-              {busy ? "Processing..." : "Checkout"}
-            </Button>
-          </CardBody>
-        </Card>
-      )}
-
-      {!authed && items.length > 0 && (
-        <div className={`mt-3 text-sm ${ui.muted}`}>
-          Login is required to create an order.
+            </>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
