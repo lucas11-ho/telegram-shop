@@ -1,5 +1,12 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { setToken, getToken } from "../lib/api";
+import { clearToken } from "../lib/api";
+
+function logout() {
+  clearToken();
+  window.location.hash = "#/";
+  window.location.reload();
+}
 
 export default function Header() {
   const nav = useNavigate();
