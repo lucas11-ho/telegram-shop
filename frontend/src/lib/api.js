@@ -1,29 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const TOKEN_EVENT = "auth:token";
 
-export function setToken(token) {
-  try {
-    if (token) localStorage.setItem("token", token);
-    window.dispatchEvent(new Event(TOKEN_EVENT));
-  } catch {}
-}
-
-export function clearToken() {
-  try {
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event(TOKEN_EVENT));
-  } catch {}
-}
-
-export function onTokenChange(cb) {
-  window.addEventListener(TOKEN_EVENT, cb);
-  window.addEventListener("storage", cb); // multi-tab
-  return () => {
-    window.removeEventListener(TOKEN_EVENT, cb);
-    window.removeEventListener("storage", cb);
-  };
-}
-
 function join(base, path) {
   return `${base.replace(/\/+$/, "")}/${String(path).replace(/^\/+/, "")}`;
 }
@@ -36,6 +13,7 @@ export function apiUrl() {
 export function setToken(token) {
   try {
     if (token) localStorage.setItem("token", token);
+    window.dispatchEvent(new Event(TOKEN_EVENT));
   } catch {}
 }
 
@@ -50,7 +28,17 @@ export function getToken() {
 export function clearToken() {
   try {
     localStorage.removeItem("token");
+    window.dispatchEvent(new Event(TOKEN_EVENT));
   } catch {}
+}
+
+export function onTokenChange(cb) {
+  window.addEventListener(TOKEN_EVENT, cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    window.removeEventListener(TOKEN_EVENT, cb);
+    window.removeEventListener("storage", cb);
+  };
 }
 
 function requestId() {
@@ -71,9 +59,9 @@ export async function api(path, { method = "GET", headers, body } = {}) {
       "X-Request-ID": requestId(),
       ...(body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(headers || {})
+      ...(headers || {}),
     },
-    body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined
+    body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined,
   });
 
   const ct = res.headers.get("content-type") || "";
@@ -85,7 +73,7 @@ export async function api(path, { method = "GET", headers, body } = {}) {
     const msg =
       typeof payload === "string"
         ? payload
-        : (payload?.detail || payload?.message || `HTTP ${res.status}`);
+        : payload?.detail || payload?.message || `HTTP ${res.status}`;
     throw new Error(msg);
   }
 
