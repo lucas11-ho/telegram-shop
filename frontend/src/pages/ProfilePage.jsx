@@ -52,16 +52,14 @@ export default function ProfilePage() {
 
       try {
         // Prefer new endpoint if it exists, otherwise fall back to /me
-        let res = await api("/profile/me");
-        if (!res.ok) res = await api("/me");
-
-        if (!res.ok) {
-          const message = res?.detail || res?.error || "Failed to load profile";
-          if (!cancelled) setErr(String(message));
-          return;
+        let payload;
+        try {
+          payload = await api("/profile/me");
+        } catch {
+          payload = await api("/me");
         }
 
-        const p = normalizeProfile(res.data || res);
+        const p = normalizeProfile(payload);
         if (!cancelled && p) setProfile((prev) => ({ ...prev, ...p }));
       } catch (e) {
         if (!cancelled) setErr(e?.message || "Failed to load profile");
@@ -88,17 +86,10 @@ export default function ProfilePage() {
       };
 
       // Prefer new endpoint if it exists
-      let res = await api("/profile/me", {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        res = await api("/me/profile", { method: "PUT", body: JSON.stringify(payload) });
-      }
-
-      if (!res.ok) {
-        setErr(String(res?.detail || res?.error || "Failed to save profile"));
-        return;
+      try {
+        await api("/profile/me", { method: "PUT", body: JSON.stringify(payload) });
+      } catch {
+        await api("/me/profile", { method: "PUT", body: JSON.stringify(payload) });
       }
       setSaved("Saved");
     } catch (e) {

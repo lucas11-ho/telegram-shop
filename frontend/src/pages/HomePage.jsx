@@ -46,14 +46,16 @@ export default function HomePage() {
   function addToCart(product) {
     try {
       const current = JSON.parse(localStorage.getItem("cart") || "[]");
-      const id = product?.id;
-      const title = product?.name || product?.title || "Untitled";
-      const price = Number(product?.price) || 0;
-      const existingIdx = current.findIndex((x) => x?.id === id);
+      const product_id = product?.id;
+      const name = product?.name || product?.title || "Untitled";
+      // backend may return price as string; keep numeric for totals
+      const price = Number.parseFloat(product?.price) || 0;
+      const currency = product?.currency || "USD";
+      const existingIdx = current.findIndex((x) => x?.product_id === product_id);
       if (existingIdx >= 0) {
-        current[existingIdx].qty = (current[existingIdx].qty || 1) + 1;
+        current[existingIdx].quantity = (current[existingIdx].quantity || 1) + 1;
       } else {
-        current.push({ id, title, price, qty: 1 });
+        current.push({ product_id, name, price, currency, quantity: 1 });
       }
       localStorage.setItem("cart", JSON.stringify(current));
       setNotice("Added to cart");

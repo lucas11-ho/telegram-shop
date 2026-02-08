@@ -21,11 +21,11 @@ function safeText(v) {
 }
 
 export default function UploadPage() {
-  const [title, setTitle] = useState("");
+  const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [currency, setCurrency] = useState("USD");
-  const [description, setDescription] = useState("");
-  const [file, setFile] = useState(null);
+  const [paymentInstructions, setPaymentInstructions] = useState("");
+  const [files, setFiles] = useState([]);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -39,7 +39,7 @@ export default function UploadPage() {
       setMsg("Please login first.");
       return;
     }
-    if (!title.trim()) {
+    if (!name.trim()) {
       setMsg("Title is required.");
       return;
     }
@@ -47,21 +47,23 @@ export default function UploadPage() {
       setMsg("Price must be a number.");
       return;
     }
-    if (!file) {
-      setMsg("Please choose an image.");
+    if (!files?.length) {
+      setMsg("Please choose at least one image.");
       return;
     }
 
     setBusy(true);
     try {
       const fd = new FormData();
-      // Keep existing backend contract intact.
-      // Existing backend contract (from original app): title, price, file
-      fd.append("title", title.trim());
+      // Primary contract (matches original Telegram Shop):
+      // name, price, currency, payment_instructions, images[]
+      fd.append("name", name.trim());
       fd.append("price", String(price));
-      // New field (backend should ignore if unsupported)
-      if (description.trim()) fd.append("description", description.trim());
-      fd.append("file", file);
+      fd.append("currency", currency);
+      if (paymentInstructions.trim()) {
+        fd.append("payment_instructions", paymentInstructions.trim());
+      }
+      files.forEach((f) => fd.append("images", f));
 
       // IMPORTANT: don't set Content-Type manually for FormData.
       const doUpload = async (formData) => {
@@ -80,18 +82,17 @@ export default function UploadPage() {
 
       let res = await doUpload(fd);
 
-      // Backward compatibility: some backends reject unknown fields (422).
-      // If so, retry WITHOUT description so uploads keep working.
-      if (!res.ok && res.status === 422 && description.trim()) {
+      // Backward compatibility: some backends use the *older* contract:
+      // title, price, file
+      if (!res.ok && res.status === 422) {
         const fd2 = new FormData();
-        fd2.append("title", title.trim());
+        fd2.append("title", name.trim());
         fd2.append("price", String(price));
-        fd2.append("file", file);
+        // pick the first image as the single file
+        fd2.append("file", files[0]);
         res = await doUpload(fd2);
         if (res.ok) {
-          setMsg(
-            "Uploaded successfully (description will appear after backend adds support)."
-          );
+          setMsg("Uploaded successfully.");
         }
       }
 
@@ -103,11 +104,11 @@ export default function UploadPage() {
 
       // Default success message (keep any special message set by the retry path)
       setMsg((prev) => (prev ? prev : "Uploaded successfully."));
-      setTitle("");
+      setName("");
       setPrice("");
       setCurrency("USD");
-      setDescription("");
-      setFile(null);
+      setPaymentInstructions("");
+      setFiles([]);
       // Clear file input value by resetting the form
       e.target.reset();
     } catch (err) {
@@ -143,8 +144,8 @@ export default function UploadPage() {
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Product title"
               />
             </div>
@@ -161,11 +162,11 @@ export default function UploadPage() {
             </div>
 
             <div>
-              <Label htmlFor="description">Description (optional)</Label>
+              <Label htmlFor="payment_instructions">Description / Instructions (optional)</Label>
               <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                id="payment_instructions"
+                value={paymentInstructions}
+                onChange={(e) => setPaymentInstructions(e.target.value)}
                 placeholder="Describe what the buyer will get..."
                 className={
                   ui.input +
@@ -180,7 +181,8 @@ export default function UploadPage() {
                 id="image"
                 type="file"
                 accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                multiple
+                onChange={(e) => setFiles(Array.from(e.target.files || []))}
                 className="block text-sm"
               />
               <div className={ui.muted + " mt-1"}>

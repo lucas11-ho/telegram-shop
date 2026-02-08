@@ -11,7 +11,7 @@ export default function ProductCard({ product, onAdd }) {
   const img = rawImg
     ? rawImg.startsWith("http")
       ? rawImg
-      : `${apiUrl()}${rawImg}`
+      : `${apiUrl()}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`
     : null;
 
   return (
@@ -29,9 +29,9 @@ export default function ProductCard({ product, onAdd }) {
       <CardBody>
         <div className="min-w-0">
           <div className="font-semibold line-clamp-1">{title}</div>
-          {product.description ? (
+          {(product.description || product.payment_instructions) ? (
             <div className={`mt-1 line-clamp-2 text-xs ${ui.muted}`}>
-              {product.description}
+              {product.description || product.payment_instructions}
             </div>
           ) : null}
           <div className={`text-sm mt-1 ${ui.muted}`}>

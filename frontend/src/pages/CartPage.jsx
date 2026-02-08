@@ -17,8 +17,14 @@ export default function CartPage() {
   }, []);
 
   const total = useMemo(() => {
-    return items.reduce((sum, it) => sum + Number(it?.price || 0), 0);
+    return items.reduce((sum, it) => {
+      const price = Number.parseFloat(it?.price) || 0;
+      const qty = Number(it?.quantity || 1) || 1;
+      return sum + price * qty;
+    }, 0);
   }, [items]);
+
+  const currency = items?.[0]?.currency || "USD";
 
   async function checkout() {
     setErr("");
@@ -48,7 +54,7 @@ export default function CartPage() {
       <div className={ui.container}>
         <div className="flex items-center justify-between py-6">
           <h1 className={ui.h1}>Cart</h1>
-          <div className="text-sm text-[#C7CDD8]">Total: {total}</div>
+          <div className="text-sm text-[#C7CDD8]">Total: {total} {currency}</div>
         </div>
 
         {err && (
@@ -66,8 +72,10 @@ export default function CartPage() {
                 {items.map((it, idx) => (
                   <li key={idx} className="flex items-center justify-between py-3">
                     <div>
-                      <div className="font-medium">{it?.title}</div>
-                      <div className="text-sm text-[#98A2B3]">{it?.price}</div>
+                      <div className="font-medium">{it?.name}</div>
+                      <div className="text-sm text-[#98A2B3]">
+                        {it?.price} {it?.currency} · qty {it?.quantity || 1}
+                      </div>
                     </div>
                   </li>
                 ))}
