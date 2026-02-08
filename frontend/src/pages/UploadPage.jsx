@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, getToken } from "../lib/api";
+import { apiUrl, getToken } from "../lib/api";
 import { ui } from "../ui/tokens";
 import { Card, CardHeader, CardBody } from "../ui/components/Card";
 import { Button } from "../ui/components/Button";
@@ -56,31 +56,38 @@ export default function UploadPage() {
     try {
       const fd = new FormData();
       // Keep existing backend contract intact.
-      fd.append("name", title.trim());
+      // Existing backend contract (from original app): title, price, file
+      fd.append("title", title.trim());
       fd.append("price", String(price));
-      fd.append("currency", currency);
       // New field (backend should ignore if unsupported)
       if (description.trim()) fd.append("description", description.trim());
-      fd.append("image", file);
+      fd.append("file", file);
 
       // IMPORTANT: don't set Content-Type manually for FormData.
-      let res = await api("/products", {
-        method: "POST",
-        body: fd,
-      });
+      const doUpload = async (formData) => {
+        const r = await fetch(`${apiUrl()}/products`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: formData,
+        });
+        const data = await r.json().catch(() => ({}));
+        return { ok: r.ok, status: r.status, data };
+      };
+
+      // Keep existing backend contract intact.
+
+      let res = await doUpload(fd);
 
       // Backward compatibility: some backends reject unknown fields (422).
       // If so, retry WITHOUT description so uploads keep working.
       if (!res.ok && res.status === 422 && description.trim()) {
         const fd2 = new FormData();
-        fd2.append("name", title.trim());
+        fd2.append("title", title.trim());
         fd2.append("price", String(price));
-        fd2.append("currency", currency);
-        fd2.append("image", file);
-        res = await api("/products", {
-          method: "POST",
-          body: fd2,
-        });
+        fd2.append("file", file);
+        res = await doUpload(fd2);
         if (res.ok) {
           setMsg(
             "Uploaded successfully (description will appear after backend adds support)."
@@ -89,7 +96,8 @@ export default function UploadPage() {
       }
 
       if (!res.ok) {
-        setMsg(safeText(res.detail || res.error || res));
+        const d = res.data || {};
+        setMsg(safeText(d.detail || d.error || d.message || d));
         return;
       }
 

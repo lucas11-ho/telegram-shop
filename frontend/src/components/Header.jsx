@@ -14,16 +14,16 @@ export default function Header() {
 
   const linkClass = (isActive) =>
     isActive
-      ? "font-semibold text-neutral-900"
-      : "text-neutral-600 hover:text-neutral-900";
+      ? "font-semibold text-[#F5F7FA]"
+      : "text-[#C7CDD8] hover:text-[#F5F7FA]";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-[#1F2A37] bg-[#0F1520]/80 backdrop-blur">
       <div className={`${ui.container} flex items-center justify-between py-3`}>
         <Link to="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#1877F2] text-white text-sm">TS</span>
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#D4AF37] text-[#0B0F14] text-sm">TS</span>
           <span>
-            Telegram <span className="text-[#1877F2]">Shop</span>
+            Telegram <span className="text-[#F5D77A]">Shop</span>
           </span>
         </Link>
 
@@ -46,7 +46,7 @@ export default function Header() {
 
           {authed && (
             <button
-              className="ml-2 rounded-lg border border-black/10 px-3 py-1.5 text-sm hover:bg-neutral-50"
+              className="ml-2 rounded-lg border border-[#2B3648] bg-[#101826] px-3 py-1.5 text-sm text-[#F5F7FA] hover:bg-[#141F2F]"
               onClick={() => {
                 clearToken();
                 nav("/");

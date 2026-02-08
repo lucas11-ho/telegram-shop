@@ -1,47 +1,48 @@
-// Minimal design tokens (Tailwind class strings)
-// Target look: Facebook-like premium (soft gray canvas + crisp white cards + one accent).
+// Luxury dark design tokens (Tailwind class strings)
+// Single accent: gold (#D4AF37).
 
 export const ui = {
   // Layout
-  page: "min-h-[100dvh] bg-[#F0F2F5] text-neutral-900",
-  container: "mx-auto max-w-5xl px-4",
+  page: "min-h-[100dvh] bg-[#0B0F14] text-[#F5F7FA]",
+  container: "mx-auto max-w-6xl px-4 md:px-6",
 
   // Typography
   h1: "text-2xl md:text-3xl font-semibold tracking-tight",
   h2: "text-lg md:text-xl font-semibold tracking-tight",
-  muted: "text-neutral-600",
+  muted: "text-[#98A2B3]",
 
   // Surfaces
-  card: "rounded-2xl border border-black/5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06)]",
+  card:
+    "rounded-2xl border border-[#1F2A37] bg-[#101826] shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
   cardHeader: "px-6 pt-6",
   cardBody: "px-6 pb-6",
 
   // Inputs
   input:
-    "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
-    "placeholder:text-neutral-400 shadow-[0_1px_0_rgba(0,0,0,0.02)] " +
-    "focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30 focus:border-[#1877F2]/40",
+    "w-full rounded-xl border border-[#2B3648] bg-[#0F1520] px-4 py-3 text-sm text-[#F5F7FA] " +
+    "placeholder:text-[#667085] shadow-[0_1px_0_rgba(0,0,0,0.2)] " +
+    "focus:outline-none focus:ring-2 focus:ring-[#F5D77A] focus:border-[#D4AF37]",
   textarea:
-    "w-full min-h-[120px] rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
-    "placeholder:text-neutral-400 shadow-[0_1px_0_rgba(0,0,0,0.02)] " +
-    "focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30 focus:border-[#1877F2]/40",
+    "w-full min-h-[120px] rounded-xl border border-[#2B3648] bg-[#0F1520] px-4 py-3 text-sm text-[#F5F7FA] " +
+    "placeholder:text-[#667085] shadow-[0_1px_0_rgba(0,0,0,0.2)] " +
+    "focus:outline-none focus:ring-2 focus:ring-[#F5D77A] focus:border-[#D4AF37]",
 
   // Buttons
   buttonPrimary:
     "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold " +
-    "bg-[#1877F2] text-white shadow-sm hover:bg-[#166FE5] active:bg-[#135FC5] " +
-    "focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30 disabled:opacity-60",
+    "bg-[#D4AF37] text-[#0B0F14] shadow-sm hover:bg-[#C9A227] active:bg-[#B88D12] " +
+    "focus:outline-none focus:ring-2 focus:ring-[#F5D77A] disabled:opacity-60",
   buttonSecondary:
     "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold " +
-    "bg-white text-neutral-900 border border-black/10 hover:bg-black/5 active:bg-black/10 " +
-    "focus:outline-none focus:ring-2 focus:ring-black/10 disabled:opacity-60",
+    "bg-[#101826] text-[#F5F7FA] border border-[#2B3648] hover:bg-[#141F2F] active:bg-[#0F1520] " +
+    "focus:outline-none focus:ring-2 focus:ring-[#F5D77A] disabled:opacity-60",
 
   // Header
   header:
-    "sticky top-0 z-10 border-b border-black/5 bg-white/90 backdrop-blur " +
-    "shadow-[0_1px_2px_rgba(0,0,0,0.04)]",
+    "sticky top-0 z-10 border-b border-[#1F2A37] bg-[#0B0F14]/80 backdrop-blur " +
+    "shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
   navLink:
-    "text-sm font-medium text-neutral-700 hover:text-neutral-900 px-2 py-1 rounded-lg " +
-    "hover:bg-black/5",
-  navLinkActive: "text-neutral-900 bg-black/5",
+    "text-sm font-medium text-[#C7CDD8] hover:text-[#F5F7FA] px-2 py-1 rounded-lg " +
+    "hover:bg-[#101826]",
+  navLinkActive: "text-[#F5F7FA] bg-[#101826]",
 };

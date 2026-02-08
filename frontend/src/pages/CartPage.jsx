@@ -48,26 +48,26 @@ export default function CartPage() {
       <div className={ui.container}>
         <div className="flex items-center justify-between py-6">
           <h1 className={ui.h1}>Cart</h1>
-          <div className="text-sm text-neutral-600">Total: {total}</div>
+          <div className="text-sm text-[#C7CDD8]">Total: {total}</div>
         </div>
 
         {err && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-xl border border-[#FB7185]/40 bg-[#FB7185]/10 px-4 py-3 text-sm text-[#FB7185]">
             {err}
           </div>
         )}
 
-        <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+        <div className={ui.card + " p-6"}>
           {items.length === 0 ? (
             <div className={ui.muted}>Your cart is empty.</div>
           ) : (
             <>
-              <ul className="divide-y divide-black/5">
+              <ul className="divide-y divide-[#1F2A37]">
                 {items.map((it, idx) => (
                   <li key={idx} className="flex items-center justify-between py-3">
                     <div>
                       <div className="font-medium">{it?.title}</div>
-                      <div className="text-sm text-neutral-500">{it?.price}</div>
+                      <div className="text-sm text-[#98A2B3]">{it?.price}</div>
                     </div>
                   </li>
                 ))}

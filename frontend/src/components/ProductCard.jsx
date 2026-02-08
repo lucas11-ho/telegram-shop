@@ -4,13 +4,21 @@ import { Button } from "../ui/components/Button";
 import { ui } from "../ui/tokens";
 
 export default function ProductCard({ product, onAdd }) {
-  const img = product.images?.[0]?.url ? `${apiUrl()}${product.images[0].url}` : null;
+  const title = product?.name || product?.title || "Untitled";
+  const price = product?.price;
+  const currency = product?.currency || "USD";
+  const rawImg = product?.images?.[0]?.url || product?.image_url || product?.image;
+  const img = rawImg
+    ? rawImg.startsWith("http")
+      ? rawImg
+      : `${apiUrl()}${rawImg}`
+    : null;
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <div className="aspect-[4/3] bg-black/5">
+    <Card className="overflow-hidden transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+      <div className="aspect-[4/3] bg-[#0F1520]">
         {img ? (
-          <img src={img} alt={product.name} className="w-full h-full object-cover" />
+          <img src={img} alt={title} className="w-full h-full object-cover" />
         ) : (
           <div className={`w-full h-full flex items-center justify-center text-sm ${ui.muted}`}>
             No image
@@ -20,19 +28,23 @@ export default function ProductCard({ product, onAdd }) {
 
       <CardBody>
         <div className="min-w-0">
-          <div className="font-semibold line-clamp-1">{product.name}</div>
+          <div className="font-semibold line-clamp-1">{title}</div>
           {product.description ? (
-            <div className="mt-1 line-clamp-2 text-xs text-neutral-600">
+            <div className={`mt-1 line-clamp-2 text-xs ${ui.muted}`}>
               {product.description}
             </div>
           ) : null}
           <div className={`text-sm mt-1 ${ui.muted}`}>
-            {product.price} {product.currency}
+            {price} {currency}
           </div>
         </div>
 
         <div className="mt-4">
-          <Button className="w-full" onClick={() => onAdd(product)}>
+          <Button
+            className="w-full"
+            onClick={() => onAdd?.(product)}
+            disabled={!onAdd}
+          >
             Add to cart
           </Button>
         </div>
